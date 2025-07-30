@@ -2,7 +2,11 @@
     "name": "kafka-consumer",
     "version": "1.0.0",
     "main": "consumer.js",
+    "scripts": {
+        "start": "node consumer.js"
+    },
     "dependencies": {
+        "express": "^4.18.2",
         "kafkajs": "^2.2.4"
     }
 }

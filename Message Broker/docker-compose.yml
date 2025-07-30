@@ -17,7 +17,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.20.17.118:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
     depends_on:
@@ -32,3 +32,23 @@ services:
       KAFKA_BROKERS: "kafka:9092"
     depends_on:
       - kafka
+
+  # kafka-producer:
+  #   build:
+  #     context: ./producer
+  #   container_name: kafka-producer
+  #   ports:
+  #     - "3000:3000"  # API để gọi POST /produce
+  #   depends_on:
+  #     - kafka
+  #   restart: unless-stopped
+
+  # kafka-consumer:
+  #   build:
+  #     context: ./consumer
+  #   container_name: kafka-consumer
+  #   ports:
+  #     - "3001:3001"  # API health check (hoặc theo dõi)
+  #   depends_on:
+  #     - kafka
+  #   restart: unless-stopped

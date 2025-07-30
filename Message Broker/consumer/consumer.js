@@ -1,31 +1,31 @@
-const { Kafka } = require("kafkajs");
+const express = require('express');
+const { Kafka } = require('kafkajs');
 
-async function runConsumer() {
-    const kafka = new Kafka({
-        clientId: "my-consumer",
-        brokers: ["kafka:9092"]
-    });
+const app = express();
+const kafka = new Kafka({
+    clientId: 'consumer-app',
+    brokers: ['172.20.17.118:9092'],
+});
 
-    const consumer = kafka.consumer({ groupId: "test-group" });
+const consumer = kafka.consumer({ groupId: 'test-group' });
 
-    let connected = false;
-    while (!connected) {
-        try {
-            await consumer.connect();
-            connected = true;
-        } catch (err) {
-            console.log("Kafka not ready yet, retrying in 3s...");
-            await new Promise((r) => setTimeout(r, 3000));
-        }
-    }
-
-    await consumer.subscribe({ topic: "test-topic", fromBeginning: true });
+(async () => {
+    await consumer.connect();
+    await consumer.subscribe({ topic: 'test-topic', fromBeginning: true });
 
     await consumer.run({
-        eachMessage: async ({ message }) => {
-            console.log(`Received: ${message.value.toString()}`);
+        eachMessage: async ({ topic, partition, message }) => {
+            console.log(`📥 Message received: ${message.value.toString()}`);
         },
     });
-}
 
-runConsumer().catch(console.error);
+    console.log('🎧 Consumer is listening...');
+})();
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'Kafka consumer is running' });
+});
+
+app.listen(3001, () => {
+    console.log('📡 Kafka Consumer API running at http://localhost:3001');
+});

@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.2
+    container_name: redis-master
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "${REDIS_SENTINEL_PASSWORD}"]
+
+  redis-sentinel:
+    image: redis:7.2
+    container_name: redis-sentinel
+    depends_on:
+      - redis
+    command: >
+      redis-sentinel /usr/local/etc/redis/sentinel.conf
+    ports:
+      - "26379:26379"
+    volumes:
+      - ./sentinel.conf:/usr/local/etc/redis/sentinel.conf
+
+  redisinsight:
+    image: redislabs/redisinsight:2.2.2
+    container_name: redisinsight
+    ports:
+      - "8001:8001"
+    environment:
+      RI_HOST: redis-master
+      RI_PORT: 6379
+      RI_PASSWORD: ${REDIS_SENTINEL_PASSWORD}
+    depends_on:
+      - redis
